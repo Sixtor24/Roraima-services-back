@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vehiculo {
+  id                Int        @id @default(autoincrement())
+  marca             String
+  tipo              String
+  ano               Int        @map("año")
+  modelo            String
+  color             String
+  placa             String     @unique
+  serialMotor       String     @map("serial_motor")
+  kilometrajeActual Int        @default(0) @map("kilometraje_actual")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  contratos         Contrato[]
+
+  @@map("vehiculos")
+}
+
+model Cliente {
+  id              Int        @id @default(autoincrement())
+  nombreCompleto  String     @map("nombre_completo")
+  cedula          String     @unique
+  direccion       String?
+  telefono        String?
+  email           String?
+  createdAt       DateTime   @default(now()) @map("created_at")
+  contratos       Contrato[]
+
+  @@map("clientes")
+}
+
+model Contrato {
+  id                 Int       @id @default(autoincrement())
+  vehiculoId         Int       @map("vehiculo_id")
+  clienteId          Int       @map("cliente_id")
+  fechaInicio        DateTime  @map("fecha_inicio")
+  fechaFin           DateTime  @map("fecha_fin")
+  dias               Int
+  canonDiarioUsd     Float     @default(140) @map("canon_diario_usd")
+  depositoUsd        Float     @default(200) @map("deposito_usd")
+  kilometrajeInicio  Int       @map("kilometraje_inicio")
+  kilometrajeFin     Int?      @map("kilometraje_fin")
+  estado             String    @default("activo")
+  observaciones      String?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  vehiculo           Vehiculo  @relation(fields: [vehiculoId], references: [id])
+  cliente            Cliente   @relation(fields: [clienteId], references: [id])
+
+  @@map("contratos")
+}
