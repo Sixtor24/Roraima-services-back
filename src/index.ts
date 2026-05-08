@@ -1,32 +1,33 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { env } from './config/env';
 import { vehiculosRouter } from './routes/vehiculos';
 import { clientesRouter } from './routes/clientes';
 import { contratosRouter } from './routes/contratos';
+import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// ── Global Middleware ──
+app.use(cors({ origin: env.CORS_ORIGIN }));
+app.use(express.json({ limit: '10mb' }));
 app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 
-// API Routes
+// ── API Routes ──
 app.use('/vehiculos', vehiculosRouter);
 app.use('/clientes', clientesRouter);
 app.use('/contratos', contratosRouter);
 
-// Health check
+// ── Health Check ──
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', environment: env.NODE_ENV, timestamp: new Date().toISOString() });
 });
 
-// Serve frontend static files in production
+// ── Serve frontend in production ──
 const frontendPath = path.join(__dirname, '..', 'client');
 app.use(express.static(frontendPath));
-app.get('*', (_req, res) => {
+app.get('/{*splat}', (_req, res) => {
   const indexPath = path.join(frontendPath, 'index.html');
   res.sendFile(indexPath, (err) => {
     if (err) {
@@ -35,8 +36,12 @@ app.get('*', (_req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Roraima Services API running on port ${PORT}`);
+// ── Global Error Handler (must be last) ──
+app.use(errorHandler);
+
+// ── Start Server ──
+app.listen(env.PORT, () => {
+  console.log(`🚀 Roraima Services API running on port ${env.PORT} [${env.NODE_ENV}]`);
 });
 
 export default app;

@@ -17,6 +17,17 @@ model Vehiculo {
   placa             String     @unique
   serialMotor       String     @map("serial_motor")
   kilometrajeActual Int        @default(0) @map("kilometraje_actual")
+  estado            String     @default("disponible")
+  precioPorDia      Float      @default(140) @map("precio_por_dia")
+  transmision       String     @default("Manual")
+  asientos          Int        @default(5)
+  tipoCombustible   String     @default("Gasolina") @map("tipo_combustible")
+  imagen            String?
+  descripcion       String?
+  velocidadMaxima   String?    @map("velocidad_maxima")
+  aceleracion       String?
+  autonomia         String?
+  caracteristicas   String[]   @default([])
   createdAt         DateTime   @default(now()) @map("created_at")
   updatedAt         DateTime   @updatedAt @map("updated_at")
   contratos         Contrato[]
