@@ -24,7 +24,8 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
-RUN npm install --production=false
+
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" npm install --production=false
 
 COPY . .
 RUN npm run build
